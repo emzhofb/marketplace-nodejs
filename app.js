@@ -19,9 +19,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req, res, next) => {
-  User.findById('5baa2528563f16379fc8a610')
+  User.findById('5cd1ad8fa13cf81dfd9933d6')
     .then(user => {
-      req.user = new User(user.name, user.email, user.cart, user._id);
+      req.user = user;
       next();
     })
     .catch(err => console.log(err));
@@ -34,9 +34,21 @@ app.use(errorController.get404);
 
 mongoose
   .connect(
-    'mongodb+srv://ikhda:wildani@cluster0-v8mzg.mongodb.net/test?retryWrites=true'
+    'mongodb+srv://ikhda:wildani@cluster0-v8mzg.mongodb.net/shop?retryWrites=true'
   )
   .then(result => {
+    User.findOne().then(user => {
+      if (!user) {
+        const user = new User({
+          name: 'Ikhda',
+          email: 'ikhda@wildani.id',
+          cart: {
+            items: []
+          }
+        });
+        user.save();
+      }
+    });
     app.listen(3000);
   })
   .catch(err => {
